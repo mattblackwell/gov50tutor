@@ -1,0 +1,618 @@
+---
+title: "Gov 50 Tutorial 1: R Basics & Data Visualization"
+tutorial:
+  id: "01-r-basics-data-viz"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to the basics of R and ggplot"
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+
+
+```{r setup, include=FALSE}
+library(gradethis)
+library(learnr)
+library(qsslearnr)
+library(gapminder)
+library(ggplot2)
+library(dplyr)
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = FALSE)
+tut_reptitle <- "Gov 50 Tutorial 1: Output Report"
+```
+
+## Basics of R
+
+### R as a calculator
+
+
+First, we'll learn how to use R as a calculator.
+
+- Use the `+` sign to add 5 and 3
+
+```{r add, exercise=TRUE}
+
+```
+
+```{r add-check}
+grade_result(
+  pass_if(~ identical(.result, 8))
+)
+```
+
+
+- Use the `-` sign to subtract 3 from 5
+
+```{r subtract, exercise=TRUE, exercise.lines = 5}
+
+```
+
+```{r subtract-check}
+grade_result(
+  pass_if(~ identical(.result, 2))
+)
+```
+
+- Use the `/` to  divide 6 by 2
+
+```{r divide, exercise=TRUE}
+
+```
+
+```{r divide-check}
+grade_result(
+  pass_if(~ identical(.result, 6 / 2))
+)
+```
+
+- Use the `sqrt()` function to take the square root of 16
+
+
+```{r sqrt, exercise=TRUE}
+
+```
+
+```{r sqrt-check}
+grade_result(
+  pass_if(~ identical(.result, sqrt(16)), "Now you know how to use R as a calculator.")
+)
+```
+
+
+
+
+### Storing results
+
+Everything in R is an object and your code will create and modify these objects. It will often be useful to save the output of a command or function as an object with a particular name to be able to quickly refer to it later in your code without having to recreate it. We say that we **assign** the output to the new object. Names of objects are case sensitive (so `My_Data` won't find an object assigned to `my_data`) and some names are not permitted (`TRUE`, `FALSE`, `NA`, and some others). While permitted, it's not good to name objects with commonly used functions like `c()` or `mean()`. We assign output to objects using the assignment operator `<-` (the less than sign `<` and then the minus sign `-` with no space between). 
+
+Let's start by creating a vector object using the `c()` function to concatenate (or combine) a sequence of numbers separated by commas:
+
+```{r cfun}
+c(4, 8, 15, 16, 23, 42)
+```
+
+Just running that command alone simply prints the object to the console and does not save or assign it anywhere. 
+
+
+- Replace `...` with the above vector object to assign it to the name `my_numbers`.
+- Print the value of `my_numbers` to the console by typing it on its own line.
+
+```{r storing, exercise = TRUE, exercise.lines = 6}
+## assign the difference here
+my_numbers <- ...
+
+## print the value of mydiff on the next line
+
+```
+
+```{r storing-check}
+grade_result_strict(
+  pass_if(~ identical(my_numbers, c(4, 8, 15, 16, 23, 42))),
+  pass_if(~ identical(.result, c(4, 8, 15, 16, 23, 42)))
+)
+```
+
+### Using functions
+
+One way we will use R a ton is through functions. Functions are the bread and butter of R. They accept *inputs* called **arguments** and return outputs. The general schematic for what function like is:
+
+```{r, eval = FALSE}
+function_name(argument1 = <value1>,
+              argument2 = <value2>,
+              argument3 = <value3)
+```
+
+
+They allow us to act on or get information about vectors and other objects. For instance, the following functions are pretty useful for any vector:
+
+- `length(x = some_numbers)` calculates the number of elements/entries in the `some_numbers` vector.
+- `min(some_numbers)` calculates the smallest value in the `some_numbers` vector.
+- `max(some_numbers)` calculates the largest value in the `some_numbers` vector .
+- `mean(x = some_numbers)` calculates the average value in the `some_numbers` vector (that is the sum of the entries divided by the number of entries).
+- `sum(some_numbers)` calculates the sum of the values in the `some_numbers` vector.
+
+Calling some of these functions
+
+
+#### Instructions
+
+- Calculate the number of elements in  the `my_numbers` vector.
+
+
+```{r mynums}
+my_numbers <- c(4, 8, 15, 16, 23, 42)
+```
+
+```{r length, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the number of entries in my_numbers
+
+```
+
+```{r length-solution}
+length(my_numbers)
+```
+
+```{r length-check}
+grade_this_code()
+```
+
+- Calculate  the minimum value of the vector.
+
+```{r min, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the minimum value of my_numbers
+
+```
+
+```{r min-solution}
+min(my_numbers)
+```
+
+```{r min-check}
+grade_this_code()
+```
+
+- Calculate the average value of the vector.
+
+```{r mean, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the average value of my_numbers
+
+```
+
+```{r mean-solution}
+mean(my_numbers)
+```
+
+```{r mean-check}
+grade_this_code()
+```
+
+
+### Characters and strings
+
+
+A lot of the time we'll work with numbers in R, but we will also want to use a lot of text which are called character strings in R. We will often use these strings to specify colors for plots, to provide labels to plots or to label categorical variables. 
+
+Create a vector called `course_topics` that contains two strings: `"data science"` and `"social science"` and print the object to the console.
+
+```{r strings, exercise=TRUE}
+## create the course_topics vector
+
+## print the value of course_topics on the next line
+
+```
+
+```{r strings-check}
+grade_result(
+  pass_if(~ identical(.result, c("data science", "social science")))
+)
+```
+
+### Checking the class of an object
+
+We've now seen two different types of objects: numbers and strings. The type of object in R is called its *class*. We can check the class of any object using the `class()` function. This can be helpful when you are unsure about what output was saved to an object. 
+
+Try checking the class of the `my_numbers` object, the `course_topics` object, and the `mean` function. 
+
+```{r class-setup, echo = FALSE}
+my_numbers <- c(4, 8, 15, 16, 23, 42)
+course_topics <- c("data science", "social science")
+```
+
+```{r class-numeric, exercise = TRUE, exercise.setup = "class-setup"}
+
+```
+
+
+```{r class-numeric-solution, exercise = TRUE}
+class(my_numbers)
+class(course_topics)
+class(mean)
+```
+
+One reason it's useful to use this function is that it can be very easy to accidentally change the class of an object in R. To see this, create a new vector called `new_vec` that concatenates `my_numbers` and the string `"DHARMA"`, print `new_vec`, and then call the `class()` function on the resulting object. 
+
+```{r class-change, exercise = TRUE, exercise.setup = "class-setup"}
+
+```
+
+
+
+```{r class-change-hint}
+new_vec <- c(my_numbers, <string to be added>)
+```
+
+```{r class-change-solution}
+new_vec <- c(my_numbers, "DHARMA")
+new_vec
+class(new_vec)
+```
+
+```{r class-change-check}
+grade_this_code()
+```
+
+What happened? Adding a string to this numeric vector changed all of the original numbers to strings themselves (notice the quotation marks around the numbers). 
+
+
+<!-- ### Copying and reassigning variables -->
+
+<!-- When we assign an existing object to a new name we always make a copy of it. This can be useful when you want it, but it also means you can lose what's in your object if you accidentally overwrite it. Here, we are going to learn about creating a copy of an object before overwriting it. -->
+
+<!-- - Assign the value of `result` to `result2` -->
+<!-- - Overwrite the value of `result` with `10 - 2` -->
+
+<!-- ```{r copying-setup} -->
+<!-- result <- 8 - 2 -->
+<!-- ``` -->
+
+<!-- ```{r copying, exercise=TRUE} -->
+<!-- ## First result -->
+<!-- result <- 8 - 2 -->
+
+<!-- ## Assign the value of "result" to "result2" -->
+
+
+<!-- ## Overwrite "result" -->
+<!-- result <- ... -->
+
+<!-- ## Print result on next line -->
+
+<!-- ``` -->
+
+<!-- ```{r copying-solution} -->
+<!-- result2 <- result -->
+<!-- ``` -->
+
+<!-- ```{r copying-check} -->
+<!-- grade_result_strict( -->
+<!--   pass_if(~ identical(result2, 8 - 2)), -->
+<!--   pass_if(~ identical(.result, 10 - 2)), -->
+<!--   pass_if(~ identical(result, 10 - 2)) -->
+<!-- ) -->
+<!-- ``` -->
+
+## Working with Data
+
+<!-- ### Working with real data -->
+
+
+<!-- Next, we are going to start working with real data: estimates of world population (in thousands). A vector of data called `world.pop` has been loaded with this lesson. The first element is for the year 1950 up to the last element for 2010. You can see that we create the vector by using the `c()` function which concatenates multiple values together into one vector. We enter the data one value at a time, each separated by a comma. -->
+
+<!-- - Print the `world.pop` data by simply typing it into a line of code. -->
+
+<!-- ```{r printdata, exercise=TRUE} -->
+<!-- ## create the world.pop data -->
+<!-- world.pop <- c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183) -->
+
+<!-- ## print the world.pop data -->
+
+<!-- ``` -->
+
+<!-- ```{r printdata-solution} -->
+<!-- world.pop -->
+<!-- ``` -->
+
+
+### Working with a data frame
+
+A data frame is an object in R that is basically like a spreadsheet with some number of rows (units) and some number of columns (variables) and a name for each column. There are a number of ways to interact with a data frame to get useful information about it. For example, if I have a data frame called `mydata`, I can do the following:
+
+- `names(mydata)` - returns the column (variable) names of the data.
+- `ncol(mydata)` - returns the number of columns in the data.
+- `nrow(mydata)` - returns the number of rows of the data.
+- `dim(mydata)` - returns a vector of the number of rows and the number of columns (the dimension of the data).
+- `summary(mydata)` - provides a summary of each variable in the data.
+
+These are super useful functions Let's use some of these on a data frame, `UNpop`, which has  estimates of world population (in thousands) in ten year intervals. 
+
+#### Exercise
+
+```{r unpop}
+UNpop <- data.frame(
+  year = seq(1950, 2010, by = 10),
+  world.pop = c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+)
+```
+
+- Print the `UNpop` data frame.
+
+```{r printdf, exercise = TRUE, exercise.setup = "unpop"}
+## Print the UNpop data frame
+
+```
+
+```{r printdf-solution}
+## Print the UNpop data frame
+UNpop
+```
+
+```{r printdf-check}
+grade_this_code()
+```
+
+
+- Output the variables names in the `UNpop` data frame.
+
+```{r namesdf, exercise = TRUE, exercise.setup = "unpop"}
+## Print the variable names of UNpop
+
+```
+
+```{r namesdf-solution}
+names(UNpop)
+```
+
+```{r namesdf-check}
+grade_this_code()
+```
+
+
+- Use the `dim` function report the number of rows and columns of the data frame.
+
+```{r dim, exercise = TRUE, exercise.setup = "unpop"}
+## Print the dimensions of UNpop
+
+```
+
+```{r dim-solution}
+## Print the UNpop data frame
+dim(UNpop)
+```
+
+```{r dim-check}
+grade_this_code()
+```
+
+
+- Use the `summary` function to show a summary of each variable.
+
+```{r summary, exercise = TRUE, exercise.setup = "unpop"}
+## Print a summary of the data in UNpop
+
+```
+
+```{r summary-solution}
+summary(UNpop)
+```
+
+```{r summary-check}
+grade_this_code()
+```
+
+### Accessing the data
+
+When our data gets bigger than this example, printing the data to the screen might be an a messy way to explore our data. There are two main ways to explore a data set:
+
+- The `glimpse()` function from the `dplyr` package (part of tidyverse). This function will show the number of rows and columns, names of each of the variables in the data frame, the data type of each column, and the first few entries. 
+- The `$` operator to extract one column of the data frame as a vector: `mydata$myvar`
+
+
+
+- Apply the `glimpse` function to the `UNpop` data frame.
+
+```{r glimpse, exercise = TRUE, exercise.setup = "unpop"}
+## Print the variable names of UNpop
+
+```
+
+```{r glimpse-solution}
+glimpse(UNpop)
+```
+
+```{r glimpse-check}
+grade_this_code()
+```
+
+
+- Extract the `world.pop` variable from the `UNpop` data frame. 
+
+```{r dollar, exercise = TRUE, exercise.setup = "unpop"}
+## Extract the world.pop variable
+
+```
+
+```{r dollar-solution}
+## Extract the world.pop variable
+UNpop$world.pop
+```
+
+```{r dollar-check}
+grade_this_code()
+```
+
+
+## Data visualization and ggplot
+
+Now we will cover how to visualize data using the "grammar of graphics" framework in the `ggplot2` package. Data visualization is all about mapping your the variables in your data set onto aesthetic attributes of the plot such as the colors, shapes, and points. We provide this information to the `ggplot()` function to start our plot. Then we specify what type of plot we want to produce: scatterplot, histogram, boxplot, etc. The `ggplot` framework calls these a geom, short for *geometric object*, and we specify them by calling a function with a `geom_` prefix such as `geom_point()` for scatter plots or `geom_histogram()` for histograms. We combine these layers of the plot using the `+` sign. 
+
+Schematically, our code will look like this:
+
+```{r, eval = FALSE}
+ggplot(data = <data>,
+       mapping = aes(<aesthetic> = <variable>,
+                     <aesthetic> = <variable>,
+                     <...> = <...>)) +
+  geom_<type>(<...>)
+```
+
+### Gapminder data
+
+To learn how to do some basic visualizations, we'll use the gapminder data from the `{gapminder}` package (if you want to follow along in RStudio, you should use the `library(gapminder)` command to load the data). The data consists of rows of country-years and various social and economic indicators for those countries in those years. 
+
+```{r showgapminder}
+gapminder
+```
+
+Let's first tell `ggplot` about the data and the aesthetic mapping for a scatterplot of life expectancy (`lifeExp`) versus GDP per capita (`gdpPercap`). Take the following code and replace the placeholder values (in the `<>` brackets) with the name of the data frame and map the x-axis to GDP and the y-axis to life expectancy (you shouldn't use quotation marks around the variable names).
+
+```{r ggplot, exercise = TRUE}
+ggplot(data = <data>, aes(x = <x-axis variable>, y = <y-axis variable>))
+```
+
+```{r ggplot-solution}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+```{r ggplot-check}
+grade_this_code(
+  correct = "Good job! But why is the plot blank? We haven't provided any instructions on what to plot yet. Let's do that now."
+)
+```
+
+
+
+### Building a scatterplot
+
+Now we will create a scatterplot by adding a geom to the ggplot call. Add a call to `geom_point()` to the call below separating it from the `ggplot()` call with a `+`. 
+
+```{r ggplot-scatter, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp))
+```
+
+```{r ggplot-scatter-solution}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+```{r ggplot-scatter-check}
+grade_this_code()
+```
+
+### Building layers of a plot
+
+You have now deployed the basic building blocks of creating plots with `ggplot`. You used `ggplot()` to point to the data and provide mappings from variables in that data to aesthetics of the plot. Then you combined that with a `geom_point()` to call to add a geometric object (points in this case) to the plot. But we can add more layers to the plot by simply adding calls to geom functions. 
+
+For instance, let's add a second `geom_` function to the plot to produce a smoothed line summarizing the relationship between these variables. To do this, simply add a call to the `geom_smooth` function to the end of the code (remember to use a `+`!). 
+
+```{r smooth, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+
+```{r smooth-solution, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth()
+```
+
+
+```{r smooth-check, exercise = TRUE}
+grade_this_code()
+```
+
+### Changing the scale of the plot
+
+Our scatterplot is bunched up on the left side, making it difficult to see what's going on. This is because the GDP per capita variable is skewed (more country-years at the low end that the high end). To better see the data, we can transform the x-axis to be on the [log scale](https://en.wikipedia.org/wiki/Logarithmic_scale). We can do this by adding a call to the `scale_x_log10()` function to put it on a log-10 basis.  
+
+
+```{r log, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth()
+```
+
+
+```{r log-solution, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth() + scale_x_log10()
+```
+
+
+```{r log-check, exercise = TRUE}
+grade_this_code()
+```
+
+Unfortunately, now the labels on the x-axis are in scientific notation, which is hard to read. To make things prettier, we can use the `scales` package to make these more readable. Specifically, replace the call to `scale_x_log10()` with `scale_x_log10(labels = scales::dollar)`. 
+
+
+```{r log-labels, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth()
+```
+
+
+```{r log-labels-solution, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth() + scale_x_log10(labels = scales::dollar)
+```
+
+
+```{r log-labels-check, exercise = TRUE}
+grade_this_code()
+```
+
+### Setting vs mapping aesthetics 
+
+Our plot is looking better! It's a little difficult to see the smoothed line in the sea of black points. Let's set three aesthetic elements by adding arguments to the `geom_point()` and `geom_smooth()` functions:
+
+- `color`: set the color of a line or point using one of [R's color names](https://r-charts.com/colors/). 
+- `alpha`: set the opacity or transparency of a point on a scale from 0 (completely transparent) to 1 (completely opaque). 
+- `size`: the size of the points or thickness of the line (1 is the default). 
+
+You can set these aesthetics by passing them as arguments to the various `geom_` functions. Our goal is to *set* all points/lines to a particular color/alpha rather than *mapping* these from variables in our data set. Because of that, we set these outside the `aes()` function as in `geom_point(color = "red")`. 
+
+
+Now let's apply this to our plot. Set the alpha on the points to 0.3, the color of the smoothed line to "coral", and the size of the smoothed line to 3. You can also play with these values to see other combinations. 
+
+```{r color-alpha, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() + geom_smooth() + scale_x_log10(labels = scales::dollar)
+```
+
+
+```{r color-alpha-solution, exercise = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.3) + geom_smooth(color = "coral", size = 2) + scale_x_log10(labels = scales::dollar)
+```
+
+
+### Finalizing our graph with labels
+
+Our graph is looking good, but the labels are using the name of the variables rather than more descriptive labels. We can add informative labels by adding the `labs()` function to our plot with arguments `x` (for the x-axis label) and `y` (for the y-axis label). We can also set the `title`, `subtitle`, and `caption`. Change those below for the values that you want:
+
+```{r labs, exercise = TRUE, exercise.eval = TRUE}
+ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(color = "coral", size = 2) +
+  scale_x_log10(labels = scales::dollar) +
+  labs(x = "<x-axis label>", y = "<y-axis label>",
+       title = "<title>",
+       subtitle = "<subtitle>",
+       caption = "<caption>")
+```
+
+
+## Submit
+
+```{r context="setup"}
+submission_ui
+```
+
+```{r context="server"}
+submission_server()
+```
