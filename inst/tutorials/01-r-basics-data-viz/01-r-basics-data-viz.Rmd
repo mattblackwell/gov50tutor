@@ -22,6 +22,7 @@ library(learnr)
 library(gapminder)
 library(ggplot2)
 library(dplyr)
+library(gov50tutor)
 tutorial_options(exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(echo = FALSE)
 tut_reptitle <- "Gov 50 Tutorial 1: Output Report"
@@ -613,9 +614,9 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 ## Submit
 
 ```{r context="setup"}
-submission_ui
+gov50tutor::submission_ui
 ```
 
 ```{r context="server"}
-submission_server()
+gov50tutor::submission_server()
 ```
