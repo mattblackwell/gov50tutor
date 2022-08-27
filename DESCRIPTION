@@ -17,7 +17,8 @@ Imports:
   gradethis (>= 0.1.0.9004),
   rlang,
   base64enc,
-  qss
+  qss,
+  here
 License: GPL-3
 URL: https://github.com/mattblackwell/gov50tutor
 BugReports: https://github.com/mattblackwell/gov50tutor/issues

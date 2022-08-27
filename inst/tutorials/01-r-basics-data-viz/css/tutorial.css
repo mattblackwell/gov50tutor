@@ -93,3 +93,5 @@ header.topicsHeader > h1 {
 }
 
 
+.ace_editor, .ace_editor * { font: 16px/normal 'Menlo', 'Monaco', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;}
+

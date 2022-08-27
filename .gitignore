@@ -1,3 +1,12 @@
-.DS_Store
+.Rproj.user
 .Rhistory
+.RData
+.Ruserdata
+.DS_Store
+
+
+inst/tutorials/*/*_files
+inst/tutorials/*/*.html
+
+# deployment output
 rsconnect/

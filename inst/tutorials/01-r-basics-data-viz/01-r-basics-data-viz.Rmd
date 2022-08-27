@@ -13,12 +13,12 @@ description: "This tutorial will introduce you to the basics of R and ggplot"
 
 <!-- Add JavaScript code for making the exercise code larger -->
 <script language="JavaScript" src="js/exercise-font-size.js"></script>
-
+ 
 
 ```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
 library(gradethis)
 library(learnr)
-library(qsslearnr)
 library(gapminder)
 library(ggplot2)
 library(dplyr)
@@ -104,10 +104,10 @@ Just running that command alone simply prints the object to the console and does
 - Print the value of `my_numbers` to the console by typing it on its own line.
 
 ```{r storing, exercise = TRUE, exercise.lines = 6}
-## assign the difference here
+## assign the vector of numbers here
 my_numbers <- ...
 
-## print the value of mydiff on the next line
+## print the value of my_numbers on the next line
 
 ```
 
@@ -198,7 +198,7 @@ grade_this_code()
 
 A lot of the time we'll work with numbers in R, but we will also want to use a lot of text which are called character strings in R. We will often use these strings to specify colors for plots, to provide labels to plots or to label categorical variables. 
 
-Create a vector called `course_topics` that contains two strings: `"data science"` and `"social science"` and print the object to the console.
+Create a vector called `course_topics` that contains two strings: `"data science"` and `"social science"` and print the object to the console. You can use the `c()` function to combine strings in the same way you combined numbers (just make sure each string is contained in quotes). 
 
 ```{r strings, exercise=TRUE}
 ## create the course_topics vector
@@ -516,13 +516,13 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 ```
 
 
-```{r smooth-solution, exercise = TRUE}
+```{r smooth-solution}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point() + geom_smooth()
 ```
 
 
-```{r smooth-check, exercise = TRUE}
+```{r smooth-check}
 grade_this_code()
 ```
 
@@ -537,15 +537,18 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 ```
 
 
-```{r log-solution, exercise = TRUE}
+```{r log-solution}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point() + geom_smooth() + scale_x_log10()
 ```
 
 
-```{r log-check, exercise = TRUE}
+```{r log-check}
 grade_this_code()
 ```
+
+
+### Fixing the axis tick labels
 
 Unfortunately, now the labels on the x-axis are in scientific notation, which is hard to read. To make things prettier, we can use the `scales` package to make these more readable. Specifically, replace the call to `scale_x_log10()` with `scale_x_log10(labels = scales::dollar)`. 
 
@@ -556,13 +559,13 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 ```
 
 
-```{r log-labels-solution, exercise = TRUE}
+```{r log-labels-solution}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point() + geom_smooth() + scale_x_log10(labels = scales::dollar)
 ```
 
 
-```{r log-labels-check, exercise = TRUE}
+```{r log-labels-check}
 grade_this_code()
 ```
 
@@ -585,7 +588,7 @@ ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
 ```
 
 
-```{r color-alpha-solution, exercise = TRUE}
+```{r color-alpha-solution}
 ggplot(data = gapminder, aes(x = gdpPercap, y = lifeExp)) +
   geom_point(alpha = 0.3) + geom_smooth(color = "coral", size = 2) + scale_x_log10(labels = scales::dollar)
 ```
