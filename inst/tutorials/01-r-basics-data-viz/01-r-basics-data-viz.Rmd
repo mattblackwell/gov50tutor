@@ -26,6 +26,7 @@ library(gov50tutor)
 tutorial_options(exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(echo = FALSE)
 tut_reptitle <- "Gov 50 Tutorial 1: Output Report"
+gapminder <- filter(gapminder, year == 2007)
 ```
 
 ## Basics of R
@@ -121,7 +122,7 @@ grade_result_strict(
 
 ### Using functions
 
-One way we will use R a ton is through functions. Functions are the bread and butter of R. They accept *inputs* called **arguments** and return outputs. The general schematic for what function like is:
+One way we will use R a ton is through functions. Functions are the bread and butter of R. They accept *inputs* called **arguments** and return outputs. The general schematic for functions in R is:
 
 ```{r, eval = FALSE}
 function_name(argument1 = <value1>,
@@ -230,7 +231,7 @@ course_topics <- c("data science", "social science")
 ```
 
 
-```{r class-numeric-solution, exercise = TRUE}
+```{r class-numeric-solution}
 class(my_numbers)
 class(course_topics)
 class(mean)
@@ -330,7 +331,7 @@ A data frame is an object in R that is basically like a spreadsheet with some nu
 - `dim(mydata)` - returns a vector of the number of rows and the number of columns (the dimension of the data).
 - `summary(mydata)` - provides a summary of each variable in the data.
 
-These are super useful functions Let's use some of these on a data frame, `UNpop`, which has  estimates of world population (in thousands) in ten year intervals. 
+These are super useful functions. Let's use some of these on a data frame, `UNpop`, which has  estimates of world population (in thousands) in ten year intervals. 
 
 #### Exercise
 
@@ -374,7 +375,7 @@ grade_this_code()
 ```
 
 
-- Use the `dim` function report the number of rows and columns of the data frame.
+- Use the `dim` function report the number of rows and columns of the data frame (the output shows rows first then columns)
 
 ```{r dim, exercise = TRUE, exercise.setup = "unpop"}
 ## Print the dimensions of UNpop
@@ -450,7 +451,7 @@ grade_this_code()
 
 ## Data visualization and ggplot
 
-Now we will cover how to visualize data using the "grammar of graphics" framework in the `ggplot2` package. Data visualization is all about mapping your the variables in your data set onto aesthetic attributes of the plot such as the colors, shapes, and points. We provide this information to the `ggplot()` function to start our plot. Then we specify what type of plot we want to produce: scatterplot, histogram, boxplot, etc. The `ggplot` framework calls these a geom, short for *geometric object*, and we specify them by calling a function with a `geom_` prefix such as `geom_point()` for scatter plots or `geom_histogram()` for histograms. We combine these layers of the plot using the `+` sign. 
+Now we will cover how to visualize data using the "grammar of graphics" framework in the `ggplot2` package. Data visualization is all about mapping the variables in your data set onto aesthetic attributes of the plot such as the colors, shapes, and points. We provide this information to the `ggplot()` function to start our plot. Then we specify what type of plot we want to produce: scatterplot, histogram, boxplot, etc. The `ggplot` framework calls these a geom, short for *geometric object*, and we specify them by calling a function with a `geom_` prefix such as `geom_point()` for scatter plots or `geom_histogram()` for histograms. We combine these layers of the plot using the `+` sign. 
 
 Schematically, our code will look like this:
 
@@ -464,7 +465,7 @@ ggplot(data = <data>,
 
 ### Gapminder data
 
-To learn how to do some basic visualizations, we'll use the gapminder data from the `{gapminder}` package (if you want to follow along in RStudio, you should use the `library(gapminder)` command to load the data). The data consists of rows of country-years and various social and economic indicators for those countries in those years. 
+To learn how to do some basic visualizations, we'll use the gapminder data from the `{gapminder}` package (if you want to follow along in RStudio, you should use the `library(gapminder)` command to load the data). The data consists of rows of country-years and various social and economic indicators for those countries in those years. We've already filtered this data to only have the measurements from 2007 to make the visualization a little easier. 
 
 ```{r showgapminder}
 gapminder
@@ -551,7 +552,7 @@ grade_this_code()
 
 ### Fixing the axis tick labels
 
-Unfortunately, now the labels on the x-axis are in scientific notation, which is hard to read. To make things prettier, we can use the `scales` package to make these more readable. Specifically, replace the call to `scale_x_log10()` with `scale_x_log10(labels = scales::dollar)`. 
+Unfortunately, now the labels on the x-axis are in scientific notation, which is hard to read. To make things prettier, we can use the `scales` package to make these more readable. Specifically, replace the call to `scale_x_log10()` with `scale_x_log10(labels = scales::dollar)`. The `::` in the `scales::dollar` command here tells R to look for the dollar function in the `scales` package. We'll learn more about this as we go!
 
 
 ```{r log-labels, exercise = TRUE}
