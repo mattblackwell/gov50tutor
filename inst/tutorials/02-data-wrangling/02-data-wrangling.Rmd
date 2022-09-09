@@ -1,0 +1,336 @@
+---
+title: "Gov 50 Tutorial 2: Data Wrangling"
+tutorial:
+  id: "02-data-wrangling"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+    df_print: tibble
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to data wrangling with dplyr"
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+ 
+
+```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
+library(gradethis)
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(gov50tutor)
+library(nycflights13)
+flights <- flights |> filter(month == 6)
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Gov 50 Tutorial 2: Output Report"
+```
+
+## Nesting functions
+
+### The pipe operator `|>`
+
+One important idea in R is *nesting function calls.* Basically, a common data wrangling pipeline takes the output of one function and passes it to the next function. We might even do this two or three or more times. 
+
+```{r}
+head(mtcars$wt)
+```
+
+```{r}
+summary(head(mtcars$wt))
+```
+
+```{r}
+names(summary(head(mtcars$wt)))
+```
+
+```{r}
+length(names(summary(head(mtcars$wt))))
+```
+
+
+Whew! This is getting a little ridiculous and it very hard to read because the order of operations works inside out (first you run `head()`, then `summary()`, and so on). 
+
+Luckily there is a better way to organize these calls, using the *pipe operator*:
+```{r}
+mtcars$wt |>
+  head() |>
+  summary() |>
+  names() |>
+  length()
+```
+
+You can think of `|>` as saying "and then do". We often write it vertically like this to make it easier to read. By default, the pipe always passes output of the previous call to the **first argument** of the next function.  
+
+
+## Filtering rows
+
+In this tutorial, we'll look at a data set of flights departing New York City in June 2013. This is a fairly clean data set that will allow to practice our wrangling skills. 
+
+```{r}
+flights
+```
+
+
+We can use the `filter()` function from the `{dplyr}` package to subset datasets based on observations. For example, if we wanted just the flights on June 25th, we could run:
+
+```{r}
+flights |> filter(day == 25)
+```
+
+We can also assign this subset to a new object:
+
+```{r}
+jun25 <- flights |>
+  filter(day == 25)
+```
+
+### Comparisons and logical operators
+
+When filtering, you need to use logical operators: `>`/`<` (greater/less than), `>=`/`<=` (greater/less than or equal to), `!=` (not equal), and `==` equal. Note that checking for equality uses two equals signs. When there are multiple arguments to filter, they combine as "and" statements: all of the conditions have to be true for a row to be selected. 
+
+```{r}
+flights |>
+  filter(day == 25, arr_delay < 10, carrier == "B6")
+```
+
+If we want something other than "and" statements, we will have to use the set of logical operators that R provides. In particular, we have `&` (and), `|` (or), and `!` (not). For instance, suppose we wanted flights with destinations of LAX or SFO, we would type:
+
+```{r}
+flights |>
+  filter(dest == "LAX" | dest == "SFO")
+```
+
+
+### Exercises
+
+Use `filter` to display the subsets of the data with the following restrictions. 
+
+Find all flights that had an arrival delay of two hours or more:
+
+```{r late-flights, exercise = TRUE}
+
+```
+
+```{r late-flights-solution}
+flights |>
+  filter(arr_delay >= 120)
+```
+
+```{r late-flights-check}
+gradethis::grade_this_code()
+```
+
+Find all flights that to Houston (`IAH` or `HOU`):
+
+```{r houston-flights, exercise = TRUE}
+
+```
+
+```{r houston-flights-solution}
+flights |>
+  filter(dest == "IAH" | dest == "HOU")
+```
+
+```{r houston-flights-check}
+gradethis::grade_this_code()
+```
+
+### `%in%` operator
+
+If we have a long set of "or" operators on the same variable, we can use the `%in%` command to make things a bit simpler. The syntax `x %in% y` will select all the values of `x` that are in the vector `y`. For instance, the same filter for `LAX` or `SFO` can be written as:
+```{r}
+flights |>
+  filter(dest %in% c("LAX", "SFO"))
+```
+
+
+Use the `%in%` command to find all flights that were operated by United ("UA"), American ("AA"), or Delta ("DL"):
+
+```{r carrier-flights, exercise = TRUE}
+
+```
+
+```{r carrier-flights-solution}
+flights |>
+  filter(carrier %in% c("UA", "AA", "DL"))
+```
+
+```{r carrier-flights-check}
+gradethis::grade_this_code()
+```
+
+
+## Summarizing variables
+
+We often would like to get numerical summaries of the variables in our dataset. These might be means, medians, measures of spread, or other ways to summarize a collection of values. The `summarize()` function in `{dplyr}` consists of a number of name-value pairs where the value is some code that summarized a variable and the name is the label we want to give that summary in the resulting data frame. Schematically, it looks like this:
+
+```{r, eval = FALSE}
+mydata |> summarize(<name1> = <code1>,
+                    <name2> = <code2>,
+                    ...)
+```
+
+So, if we wanted to get the mean (via the `mean()` function) and standard deviation (via the `sd()` function, which a measure of spread, it's not vital that we know exactly what it means right now) for the departure delay, we could do
+
+```{r}
+flights |> summarize(delay_mean = mean(dep_delay),
+                     delay_sd = sd(dep_delay))
+```
+
+Hm... what are these `NA` values?
+
+### `NA` values
+
+`NA` is how R internally represents a missing value. R doesn't know how to do arithmetic on missing values, so any time a variable has a missing value, many summary functions of R will also return `NA`. In many of these functions, we can tell R to ignore the missing values by adding the argument `na.rm = TRUE` (which means "remove" the NAs):
+
+```{r}
+flights |> summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+                     dep_sd = sd(dep_delay, na.rm = TRUE))
+```
+
+### Exercise
+
+
+Summarize the arrival delays mean and standard deviation calling the `arr_mean` and `arr_sd` labels. Be sure to avoid any issues with missing values. 
+
+```{r arr-summary, exercise = TRUE}
+flights |>
+  summarize(arr_mean = ___,
+            arr_sd = ___)
+```
+
+```{r arr-summary-solution}
+flights |> summarize(arr_mean = mean(arr_delay, na.rm = TRUE),
+                     arr_sd = sd(arr_delay, na.rm = TRUE))
+```
+
+```{r arr-summary-check}
+gradethis::grade_this_code()
+```
+
+
+## Grouping rows
+
+Using `summarize()` on the whole dataset isn't the most mind-blowing technique since we could also just use functions like `mean()` and `sd()` directly on the variables from the data. Where `summarize()` shines is in applying them separately to groups or subsets of the data defined by variables. To do summaries within groups, we first have to tell R on what variable to group the data and then the summaries we want. For example, let's say we wanted the average departure and arrival delays for each destination. Then we add a call to `group_by` to our pipe chain:
+
+```{r}
+flights |>
+  group_by(dest) |>
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE))
+```
+
+We get an output where each row is a unique destination (that is, a unique value of `dest`) and we get the means of interest applied to the flights within those values. One useful summary function here is `n()` which will return the number of observations within the group:
+
+```{r}
+flights |>
+  group_by(dest) |>
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE),
+            count = n())
+```
+
+
+### Exercise
+
+Return the average depart and arrival delay and the total number of flights for each airline. 
+
+```{r group-flights, exercise = TRUE}
+flights |>
+  group_by(___) |>
+  summarize(dep_mean = ___,
+            arr_mean = ___,
+            count = ___)
+```
+
+```{r group-flights-solution}
+flights |>
+  group_by(carrier) |>
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE),
+            count = n())
+```
+
+```{r group-flights-check}
+gradethis::grade_this_code()
+```
+
+
+You can also group by more than one variable. Try grouping by both carrier and destination and summarizing by `n()` to see how counts vary by both of those variables:
+
+```{r two-groups, exercise = TRUE}
+flights |>
+  group_by(___, ___) |>
+  summarize(count = ___)
+```
+
+```{r two-groups-solution}
+flights |>
+  group_by(carrier, dest) |>
+  summarize(count = n())
+```
+
+```{r two-groups-check}
+gradethis::grade_this_code()
+```
+
+
+
+## Mutating variables
+
+Sometimes the variables we need to create new variables that are transformation or mutations of existing variables. This is where the `mutate()` function comes in. This allows us to create new variables based on existing ones with the following syntax:
+
+```{r eval = FALSE}
+mydata |>
+  mutate(newvar = <function>(oldvar))
+```
+
+For instance, if we wanted to get the length of departure delay in hours, we could do the following:
+
+```{r}
+flights |>
+  mutate(dep_delay_hr = dep_delay / 60) |>
+  select(year, month, day, dep_delay, dep_delay_hr)
+```
+
+Here we've used the `select()` function to select the variables that we want to display. 
+
+
+### Exercises
+
+Use `mutate()` to create a `gain` variable that is the difference between the departure delay and the arrival delay. This is the amount of time that the plane made up on the journey. Then, summarize the average gain grouped by carrier. 
+
+
+```{r mutate-group, exercise = TRUE}
+flights |>
+  mutate(gain = ___) |>
+  group_by(___) |>
+  summarize(avg_gain = ___)
+```
+
+```{r mutate-group-solution}
+flights |>
+  mutate(gain = dep_delay - arr_delay) |>
+  group_by(carrier) |>
+  summarize(avg_gain = mean(gain, na.rm = TRUE))
+```
+
+```{r mutate-group-check}
+gradethis::grade_this_code()
+```
+
+
+## Submit
+
+```{r context="setup", echo = FALSE}
+gov50tutor::submission_ui
+```
+
+```{r context="server", echo = FALSE}
+gov50tutor::submission_server()
+```

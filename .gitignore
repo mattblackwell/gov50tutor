@@ -7,6 +7,9 @@
 
 inst/tutorials/*/*_files
 inst/tutorials/*/*.html
+inst/tutorials/autograder/*.json
+inst/tutorials/autograder/*.zip
+inst/tutorials/autograder/*.pdf
 
 # deployment output
 rsconnect/

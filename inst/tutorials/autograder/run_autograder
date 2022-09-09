@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+export TUTORIAL_NUM=1
+SOURCE=/autograder/source
+SUBMIT=/autograder/submission
+export SUBMIT_FILE=$(ls -1q $SUBMIT)
+NUMSUB=$(echo "$SUBMIT_FILE" | wc -l)
+
+
+if [ "$NUMSUB" == 1 ]
+then
+    cp $SUBMIT/*.pdf $SOURCE
+    cd $SOURCE
+    Rscript grade_tutorial.R 
+fi 
