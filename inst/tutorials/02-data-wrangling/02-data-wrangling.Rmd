@@ -110,7 +110,7 @@ flights |>
 
 Use `filter` to display the subsets of the data with the following restrictions. 
 
-Find all flights that had an arrival delay of two hours or more:
+Find all flights that had an arrival delay of two hours or more (note that the delay variables in this data set are in minutes):
 
 ```{r late-flights, exercise = TRUE}
 
@@ -125,7 +125,7 @@ flights |>
 gradethis::grade_this_code()
 ```
 
-Find all flights that to Houston (`IAH` or `HOU`):
+Find all flights to Houston (`IAH` or `HOU`):
 
 ```{r houston-flights, exercise = TRUE}
 
@@ -175,7 +175,7 @@ mydata |> summarize(<name1> = <code1>,
                     ...)
 ```
 
-So, if we wanted to get the mean (via the `mean()` function) and standard deviation (via the `sd()` function, which a measure of spread, it's not vital that we know exactly what it means right now) for the departure delay, we could do
+So, if we wanted to get the mean (via the `mean()` function) and standard deviation (via the `sd()` function, which is a measure of spread, it's not vital that we know exactly what it means right now) for the departure delay, we could do
 
 ```{r}
 flights |> summarize(delay_mean = mean(dep_delay),

@@ -19,9 +19,9 @@
 
 
 filename <- Sys.getenv("SUBMIT_FILE")
-tutorial_name <- paste0("Tutorial ", Sys.getenv("TUTNUM"))
 assignment_title_env_var = Sys.getenv(c("ASSIGNMENT_TITLE"))
 # Check for the existence of an environment variable called "ASSIGNMENT_TITLE"
+
 if (assignment_title_env_var != "") {
   # If the environment variable is not empty, we're in Gradescope,
   # so set the output correctly for Gradescope to find it
@@ -51,6 +51,7 @@ my.toString <- function(obj) toString(obj)
 
 metadata <- jsonlite::read_json(subjson.filename)
 gs_name <- metadata$users[[1L]]$name
+tutorial_name <- metadata$assignment$title
 
 txt <- lapply(
   strsplit(pdftools::pdf_text(filename), "\n"),

@@ -13,3 +13,5 @@ inst/tutorials/autograder/*.pdf
 
 # deployment output
 rsconnect/
+
+data-raw/localnews_replication
