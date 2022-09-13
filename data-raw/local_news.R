@@ -70,7 +70,5 @@ news <- days |>
          month) |>
   arrange(date, callsign, affiliation)
 
-write_csv(news, "data-raw/local_news.csv")
-save(news, file = "data/local_news.rda")
-
-
+write_csv(news, "data-raw/news.csv")
+save(news, file = "data/news.rda")
