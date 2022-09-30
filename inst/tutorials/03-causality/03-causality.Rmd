@@ -1,0 +1,305 @@
+---
+title: "Gov 50 Tutorial 3: Causality and Pivoting"
+tutorial:
+  id: "03-causality"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+    df_print: tibble
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to making cross tabs, pivoting, and more logical functions."
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+ 
+
+```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
+library(gradethis)
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(gov50tutor)
+library(tidyverse)
+library(nycflights13)
+flights <- flights |> filter(month == 6)
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Gov 50 Tutorial 3: Output Report"
+
+data(resume, package = "qss")
+resume <- as_tibble(resume) |>
+  rename(gender = sex) |>
+  mutate(
+    gender = fct_recode(gender, man = "male", woman = "female")
+  )
+
+
+## Used in subsetting
+resume_wf <- resume |>
+  filter(race == "white" & gender == "female")
+```
+
+## Creating cross tabs
+
+
+### Exploring the resume data
+
+
+In this tutorial, we are going to be working with the resume data from Section 2.1 of QSS. This data comes from an experiment where researchers sent fictitious resumes with different names that implied different race and gender combinations to see if potential employers were more likely to call back names associated with different racial groups and genders.
+
+Let's first explore the data a bit. It's stored as `resume`. Here's a look at it:
+
+
+```{r, echo = FALSE}
+resume
+```
+
+### Creating a cross tab
+
+
+To help you analyze this data, you can use a cross tabulation. Cross tabulation (or contingency table) is a table that quickly summarizes categorical data. For instance, in the resume data, we have a `gender` variable that tells us whether or not the fictitious resume had a name typically associated with a man or a woman (we've change the name of the variable from the textbook). 
+
+To create a cross tab, we need to modify the output of a `group_by`/`summarize` combination where each row corresponds to a combination of the grouping variables. For a cross-tab, we will have a table where rows correspond to one grouping variable and columns refer to the other. To do this, we'll need to use the `pivot_wider` function, which takes data that is "long" (each row is a combination of values) and converts to "wide" (where columns also correspond to one of the variables). Suppose we had this data:
+
+```{r}
+df <- tibble(
+  id = c("A", "B", "B", "A", "A"),
+  name = c("x", "y", "x", "y", "z"),
+  value = c(1, 2, 3, 4, 5)
+)
+
+df
+```
+
+Now, to move the `name` grouping variable to the columns, we do the following:
+
+```{r}
+df |>
+  pivot_wider(
+    names_from = name,
+    values_from = value
+  )
+```
+
+`names_from` tells us which variable contains the grouping variable we'd like to move to the columns and `values_from` tells us what values should go into the cells in the pivoted table. You can see that because the original data didn't have row with `id` equal to `B` and `name` equal to `z`, we get a missing value in that cell. 
+
+### Exercise
+
+- Using the `count` and `pivot_wider` functions, create a cross tab of the `gender` and `call` variables in the resume data. 
+- We also want to use the `pivot_wider` function to reshape the table. To do so, let's draw the names for the new columns from variable `call` and values from `n`.
+
+```{r table, exercise = TRUE}
+```
+
+```{r table-solution}
+resume |>
+  count(gender, call) |>
+  pivot_wider(names_from = call, values_from = n)
+```
+
+```{r table-check}
+grade_code()
+```
+
+
+### Comparing means across treatment conditions
+
+
+Now let's calculate an average treatment effect. You can use `filter` to create a different subset of the data corresponding to stereotypically white-sounding female names. Then, you can compare the average callback for the white-female names to the average callback for the black-female names. This will give you a sense of how the employer callback rate varies by racial group of the applicant.
+
+### Exercise
+
+Use the following chain of manipulations combined by the pipe:
+
+- Use `group_by` and `summarize` to calculate the mean of the `call` variable by both `race` and `gender`. Call the variable containing the mean `call_mean`.
+- Pivot the resulting tibble to have `race` on the columns. 
+- Create a new variable called `ate` (average treatment effect) that is the difference between the call back means for black and white applications (these columns are called `black` and `white` after pivoting). 
+
+
+
+```{r effect, exercise = TRUE}
+resume |>
+  group_by() |>
+  summarize() |>
+  pivot_wider() |>
+  mutate()
+```
+
+```{r effect-solution}
+resume |>
+  group_by(race, gender) |>
+  summarize(call_mean = mean(call)) |>
+  pivot_wider(
+    names_from = race,
+    values_from = call_mean
+  ) |>
+  mutate(
+    ate = black - white
+  )
+```
+
+```{r effect-check}
+grade_this_code("You just analyzed an experiment! Way to go!")
+```
+
+
+## More Logicals in R
+
+### Complex relationals
+
+
+In this exercise, you have the ages of a sample of 15 people, stored in the `ages` vector. We can use these relational operators to create a logical vector which indicates which ages fall within a specific range. In particular, we can find out which respondents are college-aged (18-22).
+
+We will also perform algebra on logical vectors. When we do this, all `TRUE` values are converted to `1` and all `FALSE` values are converted. For instance, we can use the `sum()` function on a logical vector to obtain the number of `TRUE` values there are:
+
+```{r}
+sum(c(TRUE, FALSE, TRUE, FALSE))
+```
+
+### Exercise
+
+- Create a logical vector, called `college_aged`, which indicates which observations in `ages` are greater than or equal to 18 and less than or equal to 22. Be sure to use parentheses to separate out the two logical statements.
+- Take the sum of the `college_aged` vector (using the `sum()` function) to determine how many people around 18-22 year old there are in the sample.
+
+```{r generate-ages}
+## check the value of the ages vector
+ages <- c(31, 20, 43, 45, 41, 46, 28, 49, 61, 19, 39)
+```
+
+
+```{r ages, exercise = TRUE}
+ages <- c(31, 20, 43, 45, 41, 46, 28, 49, 61, 19, 39)
+
+college_aged <- ...
+
+
+
+```
+
+```{r ages-solution}
+college_aged <- (ages >= 18) & (ages <= 22)
+sum(college_aged)
+```
+
+```{r ages-check}
+grade_result_strict(
+  pass_if(~ identical(college_aged, (ages >= 18) & (ages <= 22))),
+  pass_if(~ identical(.result, sum((ages >= 18) & (ages <= 22))))
+)
+```
+
+
+### `if_else`
+
+For this exercise, we'll use the resume data once again.
+
+What if we wanted to create a new vector that depends on whether a statement is true or false? For example, suppose you wanted to create an indicator variable for whether or not a specific resume had the name "Carrie." We can  create a new variable using the `if_else(X, Y, Z)` command. This command takes a logical vector as `X` and returns a new vector of the same length as `X` that has the value `Y` if that value in `X` is `TRUE` and `Z` if that value in `X` is `FALSE`.
+
+
+### Exercise
+
+- Use the `if_else` and `mutate` functions to create a new variable called `carrie` that is 1 if the resume name (`firstname`) is `"Carrie"` and 0 otherwise. Assign the output back to `resume` to save the changes. 
+- Print the first six lines of `resume` using the `head()` function to see the new variable.
+
+```{r ifelse, exercise = TRUE}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume |>
+  mutate(carrie = )
+```
+
+```{r ifelse-hint}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume |>
+  mutate(carrie = if_else(???, ???, ???))
+???()
+```
+
+
+```{r ifelse-solution}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume |>
+  mutate(carrie = if_else(firstname == "Carrie", 1, 0)) 
+head(resume)
+```
+
+```{r ifelse-check}
+grade_this_code()
+```
+
+### `case_when()`
+
+A generalization of `if_else` when you have multiple condition is `case_when()`. This function uses the tilde `~` operator, which assigns the value after the tilde to the new variable type. This is especially useful, when the conditions cannot cover every observation: in that case, you can add `TRUE ~ "other"` at the end so that the remaining observations will be assigned to the `other` value.
+
+Let's see how `case_when` works with the `starwars` dataset in the `dplyr` package:
+
+```{r}
+starwars
+```
+
+We can create a new variable called `type` that is a complicated function of the existing variables:
+```{r}
+starwars |>
+  select(name:mass, gender, species) |>
+  mutate(
+    type = case_when(
+      height > 200 | mass > 200 ~ "large",
+      species == "Droid"        ~ "robot",
+      TRUE                      ~ "other"
+    )
+  )
+```
+
+### Exercise
+
+
+Let's apply the `case_when` function to creating the an application `type` variable that combines race and gender. In particular, this variable should be `"WhiteMan"` for white male application and so on. We've included the first row to get you started:
+
+```{r casewhen, exercise = TRUE}
+resume <- resume |>
+  mutate(
+    type = case_when(
+      race == "black" & gender == "woman" ~ "Black Woman",
+      ...
+      ...
+    )
+  )
+```
+
+```{r casewhen-solution}
+resume <- resume |>
+  mutate(type = case_when(
+    race == "black" & gender == "woman" ~ "Black Woman",
+    race == "white" & gender == "woman" ~ "White Woman",
+    race == "black" & gender == "man" ~ "Black Man",
+    race == "white" & gender == "man" ~ "White Man"
+  ))
+```
+
+```{r casewhen-check}
+grade_this({
+  # custom checking code appears here
+  if (identical(.result, .solution)) {
+    pass()
+  }
+  fail()
+})
+```
+
+
+
+## Submit
+
+```{r context="setup", echo = FALSE}
+gov50tutor::submission_ui
+```
+
+```{r context="server", echo = FALSE}
+gov50tutor::submission_server()
+```

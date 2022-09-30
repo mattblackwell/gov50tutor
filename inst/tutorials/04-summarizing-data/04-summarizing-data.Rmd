@@ -1,0 +1,297 @@
+---
+title: "Gov 50 Tutorial 4: Summarizing data and handling missing values"
+tutorial:
+  id: "04-summarizing-data"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+    df_print: tibble
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to summarizing data and handling missing values."
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+ 
+
+```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
+library(gradethis)
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(gov50tutor)
+library(tidyverse)
+
+
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Gov 50 Tutorial 4: Output Report"
+
+data(STAR, package = "qss")
+star <- as_tibble(STAR)
+```
+
+## Summarizing data
+
+### Small class size data
+
+
+In this chapter, you'll analyze data from the STAR project, which is a four-year randomized trial on the effectiveness of small class sizes on education performance. The `star` data frame as been loaded into your space so that you can play around with it a bit.
+
+#### Exercises
+
+- Use the `str` function on the `star` to see what the data looks like. You can always use `head` function to view the first six rows of the data set.
+
+```{r str-star, exercise = TRUE}
+
+```
+
+```{r str-star-solution}
+str(star)
+```
+
+```{r str-star-check}
+grade_this_code()
+```
+
+
+- Use the `glimpse` function on the `star` to see what the data looks like. `glimpse` is particularly useful when the data set contains a long list of variables (columns), as it allows you to see every column by transposing the original data set. 
+
+```{r glimpse-star, exercise = TRUE}
+
+```
+
+```{r glimpse-star-solution}
+glimpse(star)
+```
+
+```{r glimpse-star-check}
+grade_this_code()
+```
+
+- Use the `dim_desc` function on the `star` to see what the dimensions of the data look like.
+
+```{r dim_desc-star, exercise = TRUE}
+
+```
+
+```{r dim_desc-star-solution}
+dim_desc(star)
+```
+
+```{r dim_desc-star-check}
+grade_this_code()
+```
+
+
+- Use the `summary` function on the `star` to get a sense for each variable.
+
+```{r summary-star, exercise = TRUE}
+
+```
+
+```{r summary-star-solution}
+summary(star)
+```
+
+```{r summary-star-check}
+grade_this_code()
+```
+
+
+### New summary functions
+
+We have been using the `mean()` function quite a bit to summarize a variable via the sample average/sample mean. This is one way to measure the center of the data. Another way to measure the center of the distribution of a variable is the **median**, which is defined as the middle value of the variable after ordering the values from smallest to largest. We can calculate it in R with the `median()` function that works very similarly `mean()`. We can measure spread via the **standard deviation** which can be calculated with the `sd()` function or the square of that value, called the **variance**, with the function `var()`. 
+
+
+Use the template below to summarize the median and standard deviation of the 4th grade math score (`g4math`) by class type. Remember to remove missing values using the `na.rm = TRUE` argument just like with `mean()`. 
+
+```{r median_sd, exercise = TRUE}
+star |>
+  group_by(classtype) |>
+  summarize(
+    math_mean = mean(g4math, na.rm = TRUE),
+    math_median = ____,
+    math_sd = ____
+  )
+```
+
+
+```{r median_sd-solution}
+star |>
+  group_by(classtype) |>
+  summarize(
+    math_mean = mean(g4math, na.rm = TRUE),
+    math_median = median(g4math, na.rm = TRUE),
+    math_sd = sd(g4math, na.rm = TRUE)
+  )
+```
+
+```{r median_sd-check}
+grade_this_code()
+```
+
+
+
+## Handling Missing Data in R
+
+
+### Data wrangling with tidyverse: Handling missing data
+
+You probably noticed that there were some `NA` values in the data when you used the `str` and `glimpse` functions. These are **missing values**, where the value for that unit on that variable is missing or unknown. These values pose problems when we are trying to calculate quantities of interest like means or medians because R doesn't know how to handle them. 
+
+The `drop_na` function looks at the data frame and removes all rows (observations) with at least one missing value. In other words, it only keeps the complete rows by deleting rows where any column (variable) is filled with a `NA` value. However, this also means that `drop_na` will cause *listwise deletion*, which gets rid of the entire row even when it contains important information in other columns. Thus, it is important to specify which columns to use to drop missing data.  
+
+#### Exercises
+- Use the `drop_na` function to drop the rows with missing values in variable `g4math`. 
+
+```{r drop_na, exercise = TRUE}
+
+```
+
+```{r drop_na-solution}
+star |> drop_na(g4math)
+```
+
+```{r drop_na-check}
+grade_this_code()
+```
+
+### `is.na()` logically testing for missingness
+
+Testing for the presence of an `NA` is actually a little tricky because `NA` values tend to propagate through operators. For example,
+
+```{r}
+NA > 50
+42 == NA
+```
+
+Both of these return `NA` because they are saying we can't tell if the statement is true or not: the truth statement is unknown. This leads to head scratchers like this:
+
+```{r}
+NA == NA
+```
+
+Clearly, using `==` or `!=` isn't going to help us test for the presence of missingness. To do that, we can use the `is.na()` function which returns `TRUE` if an entry is `NA` and `FALSE` otherwise:
+```{r}
+is.na(c(TRUE, NA, FALSE))
+is.na(c(1, 2, NA))
+is.na(c(NA, "b", "c"))
+```
+
+#### Exercise
+
+Use the `is.na()` function to filter to the observations of the `star` dataset that are missing `g4math`. 
+
+```{r is_na, exercise = TRUE}
+
+```
+
+```{r is_na-solution}
+star |>
+  filter(is.na(g4math))
+```
+
+```{r is_na-check}
+grade_this_code()
+```
+
+## More plotting commands
+
+### Adding lines and text to a plot
+
+We'll often want to add more information to a plot to make it even more readable. You can do that with geoms that add to the current plot, such as `geom_abline` and `annotate`.
+
+- `geom_abline`: adds a line with specific slope and intercept
+- `geom_vline`: adds a vertical line
+- `geom_hline`: adds a horizontal line
+
+#### Exercises
+
+
+- Use the `geom_vline` function to add a vertical line on the histogram coded below at the mean of the `g4math` variable from the `star` data (remember that you can calculate the mean of a variable in a data set calling `mean(mydata$myvar, na.rm = TRUE)`). By default, missing values are removed by ggplot with a warning and you can use the `na.rm = TRUE` argument to silently remove them.
+- You are encouraged to use the pipe operator.
+
+```{r hist-line, exercise = TRUE}
+## add a vertical line at the mean of the variable
+star |>
+  ggplot(aes(x = g4math)) +
+  geom_histogram() +
+  geom_vline(xintercept = mean(____, na.rm = TRUE)) #use the dollar sign 
+```
+
+```{r hist-line-solution}
+star |>
+  ggplot(aes(x = g4math)) +
+  geom_histogram() +
+  geom_vline(xintercept = mean(star$g4math, na.rm = TRUE)) #use the dollar sign 
+```
+
+```{r hist-line-check}
+grade_this_code()
+```
+
+### Adding text to a plot
+
+We'll sometimes want to add text to a plot to make it more informative. `annotate(geom = "text", x = 8, y = 9, label = "A")` adds a character string `A` centered at point on the (`8`, `9`) on the plot. You can use the axis labels to see where you might want to add these parts of the plot.
+
+#### Exercise
+
+- Use the `annotate` function to add the string `Average Score` to the plot at the point (750, 350).
+- Make sure to separate the arguments in function calls with commas.
+- You are encouraged to use the pipe operator.
+
+```{r hist-text, exercise = TRUE}
+## add the text "Average Score" at the specified location
+star |>
+  ggplot(aes(x = g4math)) +
+  geom_histogram() +
+  geom_vline(xintercept = mean(star$g4math, na.rm = TRUE)) 
+```
+
+```{r hist-text-solution}
+## add the text "Average Score" at the specified location
+star %>% ggplot(aes(x = g4math)) +
+  geom_histogram() +
+  geom_vline(xintercept = mean(star$g4math, na.rm = TRUE)) +
+  annotate(geom = "text", x = 750, y = 350, label = "Average Score")
+```
+
+```{r hist-text-check}
+grade_this_code()
+```
+
+
+## Selecting random sample 
+
+We have seen how to select certain rows by their row number or by their value on a particular variable, including the top X on some variable. But what if we want to take a random sample of our data. Then we can use the `slice_sample(star, n = 10)`, which in this case will give a random sample of 10 rows of `star`. 
+
+Use this function and `filter` to take a random sample of 5 students who scored over 700 on their `g4math`. 
+
+```{r slice_sample, exercise = TRUE}
+
+```
+
+```{r slice_sample-solution}
+star |>
+  filter(g4math > 700) |>  
+  slice_sample(n = 5)
+```
+
+```{r slice_sample-check}
+grade_this_code()
+```
+
+
+## Submit
+
+```{r context="setup", echo = FALSE}
+gov50tutor::submission_ui
+```
+
+```{r context="server", echo = FALSE}
+gov50tutor::submission_server()
+```

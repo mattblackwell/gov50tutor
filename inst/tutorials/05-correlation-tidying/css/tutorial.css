@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,700;1,400;1,700&family=Fira+Sans+Condensed:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+body {
+    font-size: 16px;
+    font-family: Fira Sans Condensed, sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    font-family: Fira Sans Condensed, sans-serif;
+    weight: 1000;
+
+}
+
+.topicsList .topic {
+    font-size: 18px;
+}
+
+p.caption {
+  font-size: 0.6em;
+}
+
+.band {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.bandContent {
+    margin: 0 auto 0 0;
+}
+
+.topicsContainer {
+    background-color: #3498db;
+}
+
+header.topicsHeader > h1 {
+    color: white;
+}
+
+.topicsList {
+    margin-left: 0px;
+}
+
+.topicsList .topic {
+    line-height: unset;
+    color: white;
+    background-color: unset;
+    border-bottom: unset;
+}
+
+.topicsFooter {
+    color: white;
+}
+
+
+.topicsList .topic .nav-link  {
+    color: #FFF;
+    border-radius: 0;
+}
+
+.topicsList .topic.current .nav-link  {
+    color: #cf4446;
+    font-weight: bold;
+}
+
+.nav-stacked > li + li {
+    margin-top: 0px;
+}
+
+.topicsList .topic a.nav-link:hover  {
+    color: #555;
+    background-color: #FFF;
+}
+
+
+/* these two fix the backgrounds on the navlinks*/
+.topicsList .topic.current {
+  background-color: #FFF;
+  font-weight: normal;
+}
+
+
+.topicsList .topic {
+  background-color: unset;
+}
+
+.btn-primary, .btn-success, .btn-info {
+    background-color: #3498db;
+}
+
+.tutorial-exercise-input .btn-xs,
+.tutorial-exercise-input .btn-sm {
+  font-size: 12px;
+}
+
+
+.ace_editor, .ace_editor * { font: 16px/normal 'Menlo', 'Monaco', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;}
+
