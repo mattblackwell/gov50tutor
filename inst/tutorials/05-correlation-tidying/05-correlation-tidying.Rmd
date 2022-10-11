@@ -1,7 +1,7 @@
 ---
 title: "Gov 50 Tutorial 5: Correlation, z-scores, and tidying data"
 tutorial:
-  id: "04-summarizing-data"
+  id: "05-correlation-tidying"
 output:
   learnr::tutorial:
     progressive: true

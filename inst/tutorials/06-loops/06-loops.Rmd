@@ -1,0 +1,259 @@
+---
+title: "Gov 50 Tutorial 6: Loops"
+tutorial:
+  id: "06-loops"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+    df_print: tibble
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to loops."
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+ 
+
+```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
+library(gradethis)
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(gov50tutor)
+library(tidyverse)
+library(gov50data)
+
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Gov 50 Tutorial 6: Output Report"
+
+library(gapminder)
+```
+
+## Conceptual questions
+
+
+
+### Loops
+
+```{r concept, echo=FALSE}
+quiz(caption = "",
+     question("True or False: Loops can simplify our programming code when we want to repeatedly execute code chunks over and over again.",
+              answer("True", correct = TRUE),
+              answer("False")),
+     question("To iterate means to: ",
+              answer("perform repeatedly", correct = TRUE),
+              answer("perform once"),
+              answer("skip over"))
+     )
+```
+
+
+Suppose we assign `n <- 10` how many times will the loop `for (i in 1:n)` iterate?
+
+
+
+```{r n_times, echo = FALSE}
+question_text("Number of iterations:",
+              answer("10", correct = TRUE),
+              allow_retry = TRUE)
+```
+
+
+## Coding loops
+
+We have seen how writing our own function can reduce the need to write the same code multiple times varying it just a little. A loop is similar to a function in that it is a template of code with placeholders for objects that we want to change each time we execute the template. With a loop, though, we provide a list of values to the loop that the placeholder should take, and the loop iterates through those items, executing the template with each placeholder value, one after the other. 
+
+To draw on an example from [R for Data Science](https://r4ds.had.co.nz/iteration.html#for-loops), suppose we had this small tibble:
+
+```{r echo=-1}
+set.seed(1234)
+df <- tibble(
+  a = rnorm(10),
+  b = rnorm(10),
+  c = rnorm(10),
+  d = rnorm(10)
+)
+```
+
+What if we wanted to calculate the median of each column? We could do that manually:
+
+```{r}
+median(df$a)
+median(df$b)
+median(df$c)
+median(df$d)
+```
+
+But we had to copy and paste this, which is a waste since there is a clear template:
+
+```{r}
+#| eval: false
+median(█)
+```
+
+where `█` is a column of the tibble. We can create loop that executes this in the following way:
+
+```{r}
+result <- rep(NA, times = ncol(df))
+for (i in seq_along(df)) {
+  result[i] <- median(df[[i]])
+}
+result
+```
+
+
+The first line here creates a vector to hold the output filled with missing values. The second line sets up what we will iterate over, where `i` is the name of the placeholder and `seq_along(df)` produces a sequence of numbers that the placeholder will take:
+
+```{r}
+seq_along(df)
+```
+
+Inside the curly braces, we have the body of the loop which calculates median of `df[[i]]` (which accesses the `i`-th column of the tibble) and saves the result to position `i` of the `results` vector. The loop executes the body as many times as there are values in `seq_along(df)`, replacing `i` with each value in that placeholder list. 
+
+
+
+### Loop practice
+
+Let's begin by coding the creation an empty vector to store the computational output from a loop. You can think of this as a bookshelf with spots for the result of each iteration of the loop. We're going to switch data sets and focus on iterating on the columns of the `gapminder` data, which we have loaded into the session. We can perform this task using the `rep()` function which creates a vector by repeating whatever value is given to it. For instance, we can run:
+
+```{r}
+rep(10, times = 5)
+```
+
+Using the `rep()` function, create a vector called `output` that is filled with `NA` values and has length `ncol(gapminder)`. 
+
+
+```{r holder, exercise = TRUE}
+output <- ___(_____)
+output
+```
+
+```{r holder-solution}
+output <-  rep(NA, times = ncol(gapminder))
+output
+```
+
+
+```{r holder-check}
+grade_this_code()
+```
+
+### `seq_along()`
+
+Let's get comfortable with the  `seq_along()` function. This function creates a sequence of integers that is as long as the vector you pass to it or as long as the number columns in the data frame that you pass to it. Call `seq_along` on the `gapminder` data to see what it returns:
+
+```{r seq_along, exercise = TRUE}
+
+```
+
+```{r seq_along-solution}
+seq_along(gapminder)
+```
+
+```{r seq_along-check}
+grade_this_code()
+```
+
+### Accessing data using brackets
+
+In a tibble or a data frame, you can access a column by its position by putting its numbered position in double brackets like so: `gapminder[[1]]` returns the first column vector. Use this to call the `head()` and then `class()` functions on the 2nd column of the `gapminder` data:
+
+```{r brackets, exercise = TRUE}
+____(______[[_]])
+____(______[[_]])
+```
+
+```{r brackets-solution}
+head(gapminder[[2]])
+class(gapminder[[2]])
+```
+
+```{r brackets-check}
+grade_this_code()
+```
+
+
+### Building the loop
+
+Let's now build a loop for calculating the class of each column of the `gapminder` data. Use the loop written and your last few exercises above as a guide.
+
+```{r loop, exercise = TRUE}
+output <- rep(NA, times = ncol(gapminder))
+for (i in _____) {
+  output[i] <- ____(____)
+}
+output
+```
+
+```{r loop-solution}
+output <- rep(NA, times = ncol(gapminder))
+for (i in seq_along(gapminder)) {
+  output[i] <- class(gapminder[[i]])
+}
+output
+```
+
+```{r loop-check}
+grade_this_code()
+```
+
+
+
+### Printing to the screen
+
+In R, it's often very useful to print something to the screen and this is especially helpful when using loops. This can help us diagnose problems in the loop. We can use the `print()` and `str_c` functions to produce output that prints out a string and the value of an R object like so:
+
+```{r}
+print(str_c("The value of pi is ", pi, "."))
+```
+
+
+Now, use the `print()` and `str_c` to print the string `The gapminder data has 6 columns.` without using the number `6` but rather the object `ncol(gapminder)`. 
+
+```{r cat, exercise = TRUE}
+
+```
+
+```{r cat-solution}
+print(str_c("The gapminder data has ", ncol(gapminder), " columns."))
+```
+
+```{r cat-check}
+grade_this_code()
+```
+
+### unique
+
+It is very common to loop over the unique values of a variable or vector. To do this, we can use the `unique(myvec)` function, which will return all the unique values of `myvec` without repeating. 
+
+We've added the following vector `fruit` to the code. Use the `unique()` function to determine the different types of fruit in the vector. 
+
+
+```{r unique, exercise = TRUE}
+fruit <- c("apple", "orange", "banana", "orange", "apple", "apple")
+
+```
+
+```{r unique-solution}
+fruit <- c("apple", "orange", "banana", "orange", "apple", "apple")
+
+unique(fruit)
+```
+
+```{r unique-check}
+grade_code()
+```
+
+## Submit
+
+```{r context="setup", echo = FALSE}
+gov50tutor::submission_ui
+```
+
+```{r context="server", echo = FALSE}
+gov50tutor::submission_server()
+```
