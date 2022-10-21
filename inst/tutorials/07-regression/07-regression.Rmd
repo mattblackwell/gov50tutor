@@ -1,0 +1,162 @@
+---
+title: "Gov 50 Tutorial 7: Regression and Sampling"
+tutorial:
+  id: "07-regression"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+    df_print: tibble
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to regression and sampling."
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+ 
+
+```{r setup, include=FALSE}
+# file.path(find.package('gov50tutor'), 'tutorials', 'tutorial.css')
+library(gradethis)
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(gov50tutor)
+library(tidyverse)
+library(gov50data)
+library(infer)
+
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Gov 50 Tutorial 6: Output Report"
+
+library(gapminder)
+```
+
+## Linear Regression
+
+### Conceptual questions
+
+```{r lm-multi, echo = FALSE}
+quiz(
+  caption = "",
+  question(
+    "We use the regression line to predict the value of the outcome variable y hat, otherwise known as:",
+    answer("predicted value"),
+    answer("fitted value"),
+    answer("both of these", correct = TRUE)),
+  question(
+    "The differences between the observed outcome and its predicted value is called a:",
+    answer("residual"),
+    answer("prediction error"),
+    answer("either of these", correct = TRUE)),
+  question(
+    "An R^2 close to 1 suggests the model fits:",
+    answer("well", correct = TRUE),
+    answer("not well")),
+  question(
+    "With a single binary independent variable, what is the interpretation of the slope coefficient in a linear regression model?",
+    answer("Average outcome in the `X = 1` group"),
+    answer("Average outcome in the `X = 0` group"),
+    answer("Differences in means between the `X=1` and `X=0` groups", correct = TRUE))
+)
+```
+
+### Interpreting intercepts
+
+In the following box, type answer to the following question: The intercept in the model $Y_i = \alpha + \beta X_i + \epsilon_i$ represents the average value of $Y_i$ when $X_i$ is equal to what?
+
+```{r intercept, echo = FALSE}
+question_text(
+  "The intercept is the average of Y when X is equal to:",
+  answer("0", correct = TRUE)
+)
+```
+
+## Sampling 
+
+### Obtaining a random subset of the data
+
+We will start to think about randomly sampling from a dataset. We can use the `slice_sample()` function from `dplyr` to sample a certain number of rows from the data. For example, if we want to take a random draw of 5 rows of data we can call:
+
+```{r}
+gapminder |>
+  slice_sample(n = 5)
+```
+
+Now try this for yourself. Write code that will randomly draw 10 rows from the `gapminder` data. Try running the code multiple times to see how the output changes with each sample. 
+
+```{r sample, exercise = TRUE}
+
+```
+
+```{r sample-solution}
+gapminder |>
+  slice_sample(n = 10)
+```
+
+
+```{r sample-check}
+grade_this_code()
+```
+
+There are several arguments to `slice_sample()` that can change its behavior. For example, you can set `replace = TRUE` to allow for rows/units to be sampled multiple times. Try to sample 10 rows again, this time allowing for replacement. Try repeatedly sampling to see if you get the same unit twice (you may not). 
+
+
+```{r sample_replace, exercise = TRUE}
+
+```
+
+```{r sample_replace-solution}
+gapminder |>
+  slice_sample(n = 10, replace = TRUE)
+```
+
+
+```{r sample_replace-check}
+grade_this_code()
+```
+
+### Repeated sampling using the `infer` package
+
+The `{infer}` package provides tools for doing repeated sampling that is useful when we are learning about sampling. The function `infer::rep_slice_sample()` will sample the data multiple times and bind the samples together with a new column that indicates which replicate the draws are from. For instance, let's take 5 samples of size n=2 from the `gapminder` data. 
+
+```{r}
+gapminder |>
+  rep_slice_sample(n = 2, reps = 5)
+```
+
+
+Try this for yourself. Use `rep_slice_sample()` to take 10 samples of size n=100 from `gapminder`, then group the resulting tibble by `replicate` and summarize the mean of `lifeExp`. 
+
+
+```{r rep_sample, exercise = TRUE}
+gapminder |>
+  _____(___, ____) |>
+  group_by(______) |>
+  summarize(lifeExp_mean = ____)
+```
+
+```{r rep_sample-solution}
+gapminder |>
+  rep_slice_sample(n = 100, reps = 10) |>
+  group_by(replicate) |>
+  summarize(lifeExp_mean = mean(lifeExp))
+```
+
+
+```{r rep_sample-check}
+grade_this_code()
+```
+
+
+## Submit
+
+```{r context="setup", echo = FALSE}
+gov50tutor::submission_ui
+```
+
+```{r context="server", echo = FALSE}
+gov50tutor::submission_server()
+```
