@@ -29,7 +29,7 @@ library(infer)
 
 tutorial_options(exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(echo = TRUE)
-tut_reptitle <- "Gov 50 Tutorial 6: Output Report"
+tut_reptitle <- "Gov 50 Tutorial 7: Output Report"
 
 library(gapminder)
 ```
